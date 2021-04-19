@@ -137,11 +137,12 @@ impl CmdArgs {
 
 fn main() {
     let args: Vec<_> = env::args().collect();
-    if args.len() == 0 {
-        show_help();
-        return;
-    }
-    let opt = CmdArgs::parse(args[1..].to_vec());
+    let opt = if args.len() < 1 {
+        CmdArgs::parse(args)
+    } else {
+        CmdArgs::parse(args[1..].to_vec())
+    };
+
     if opt.flag_help {
         show_help();
         return;
