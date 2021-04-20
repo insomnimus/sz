@@ -40,10 +40,10 @@ fn calc_size(name: &str) -> u64 {
 fn show_help() {
     let cmd = match env::current_exe() {
         Ok(p) => match p.file_name() {
-            Some(s) => s.to_str().unwrap().to_owned(),
-            None => String::from("which"),
+            Some(s) => s.to_str().unwrap_or("rs-size").to_owned(),
+            None => String::from("rs-size"),
         },
-        Err(_) => String::from("which"),
+        Err(_) => String::from("rs-size"),
     };
     eprintln!(
         "{}, calculate file sizes
