@@ -7,35 +7,36 @@ use walkdir::WalkDir;
 
 /// calc_dir calculates the total size of every file under a directory, recursively.
 fn calc_dir(dir: &str) -> u64 {
-    let mut sum: u64 = 0;
-    for entry in WalkDir::new(dir).into_iter().filter_map(|e| e.ok()) {
-        if entry.file_type().is_dir() {
-            continue;
-        }
-        sum += match entry.metadata() {
-            Err(_) => 0,
-            Ok(m) => m.len(),
-        };
-    }
-    sum
+    WalkDir::new(dir)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|x| !x.file_type().is_dir())
+        .fold(0u64, |sum, x| {
+            sum + match x.metadata() {
+                Err(_) => 0,
+                Ok(m) => m.len(),
+            }
+        })
 }
 
 /// calc_size calculates the size of either a directory or a plain file.
 fn calc_size(name: &str) -> u64 {
-    let md = match fs::metadata(name) {
-        Ok(m) => m,
+    match fs::metadata(name) {
+        Ok(m) => {
+            if m.is_dir() {
+                calc_dir(name)
+            } else {
+                m.len()
+            }
+        }
         Err(err) => match err.kind() {
             ErrorKind::NotFound => {
                 eprintln!("{}: does not exist", name);
                 process::exit(1);
             }
-            _ => return 0,
+            _ => 0,
         },
-    };
-    if md.is_dir() {
-        return calc_dir(name);
     }
-    md.len()
 }
 
 fn show_help() {
@@ -55,7 +56,7 @@ options:
 	-h, --help: show this message and exit",
         cmd, cmd
     );
-    std::process::exit(0);
+    process::exit(0);
 }
 
 struct CmdArgs {
