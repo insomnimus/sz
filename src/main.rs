@@ -2,6 +2,7 @@ use pretty_bytes::converter::convert;
 use std::env;
 use std::fs;
 use std::io::ErrorKind;
+use std::process;
 use walkdir::WalkDir;
 
 /// calc_dir calculates the total size of every file under a directory, recursively.
@@ -26,7 +27,7 @@ fn calc_size(name: &str) -> u64 {
         Err(err) => match err.kind() {
             ErrorKind::NotFound => {
                 eprintln!("{}: does not exist", name);
-                std::process::exit(1);
+                process::exit(1);
             }
             _ => return 0,
         },
@@ -95,19 +96,25 @@ impl CmdArgs {
         }
     }
 
+    // windows powershell/cmd.exe does not have glob expansion, so we provide one.
     #[cfg(windows)]
     pub fn calculate(&self) -> u64 {
         use glob::glob;
         use itertools::Itertools;
+
         if self.files.len() == 0 {
             return calc_dir("./");
         }
+
         let mut files: Vec<String> = vec![];
 
         for s in &self.files {
             if s.contains("*") || s.contains("[") || s.contains("?") {
                 for result in glob(&s[..])
-                    .expect("failed to read the glob pattern")
+                    .unwrap_or_else(|e| {
+                        eprintln!("failed to read the glob pattern: {:?}", e);
+                        process::exit(1);
+                    })
                     .filter(|x| x.is_ok())
                     .map(|x| x.unwrap().into_os_string().into_string())
                     .filter(|x| x.is_ok())
