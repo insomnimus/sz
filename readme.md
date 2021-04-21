@@ -18,14 +18,15 @@ You have two options to install rs-size:
 ### Installation Using Git
 
 ```
-git clone https://www.github.com/insomnimus/rs-size
+git clone https://github.com/insomnimus/rs-size
 cd rs-size
+git checkout main
 cargo install --path .
 ```
 
 ### Installation Using Cargo
 
-`cargo install --git https://www.github.com/insomnimus/rs-size.git`
+`cargo install --git https://github.com/insomnimus/rs-size.git --branch main`
 
 # Usage
 
