@@ -11,6 +11,7 @@ Tiny tool that calculates file sizes, written in rust.
 # Installation
 
 You'll need cargo and the rust compiler, preferably v1.5 and above.
+Note that, after installing, the binary will be named `rsize`.
 
 You have two options to install rs-size:
 
