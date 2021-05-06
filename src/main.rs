@@ -43,9 +43,9 @@ fn show_help() {
     let cmd = match env::current_exe() {
         Ok(p) => match p.file_name() {
             Some(s) => s.to_str().unwrap_or("rs-size").to_owned(),
-            None => String::from("rs-size"),
+            None => String::from("sz"),
         },
-        Err(_) => String::from("rs-size"),
+        Err(_) => String::from("sz"),
     };
     eprintln!(
         "{}, calculate file sizes

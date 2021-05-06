@@ -1,11 +1,11 @@
 [package]
-name = "rs-size"
+name = "sz"
 version = "0.1.0"
 authors = ["insomnimus <insomnimus19@gmail.com>"]
 edition = "2018"
 
 [[bin]]
-name = "rsize"
+name = "sz"
 path = "src/main.rs"
 
 [dependencies]

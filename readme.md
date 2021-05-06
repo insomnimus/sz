@@ -1,4 +1,4 @@
-# rs-size
+# sz
 
 Tiny tool that calculates file sizes, written in rust.
 
@@ -11,27 +11,26 @@ Tiny tool that calculates file sizes, written in rust.
 # Installation
 
 You'll need cargo and the rust compiler, preferably v1.5 and above.
-Note that, after installing, the binary will be named `rsize`.
 
-You have two options to install rs-size:
+You have two options to install sz:
 
 ### Installation Using Git
 
 ```
-git clone https://github.com/insomnimus/rs-size
-cd rs-size
+git clone https://github.com/insomnimus/sz
+cd sz
 git checkout main
 cargo install --path .
 ```
 
 ### Installation Using Cargo
 
-`cargo install --git https://github.com/insomnimus/rs-size.git --branch main`
+`cargo install --git https://github.com/insomnimus/sz --branch main`
 
 # Usage
 
-If you followed any of the installation steps above, you should have the rs-size binary (installs as rsize) in your cargo home path (or ~/.cargo/bin).
+If you followed any of the installation steps above, you should have the sz binary in your cargo home path (or ~/.cargo/bin).
 
-The usage is very simple, you just give rsize some file names and it coutns the sizes.
+The usage is very simple, you just give sz some file names and it calculates the sizes.
 If called without args, it calculates the size of the current directory.
 Call with `-b` to get the byte count without pretty printing.
