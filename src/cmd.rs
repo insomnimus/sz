@@ -7,6 +7,7 @@ use std::{
 use walkdir::WalkDir;
 pub struct Cmd {
     ignore_hidden: bool,
+    ignore_errors: bool,
     follow_links: bool,
     pub bytes: bool,
     files: Vec<String>,
@@ -29,6 +30,11 @@ impl Cmd {
             .long("ignore-hidden")
             .about("ignore hidden files and directories");
 
+        let ignore_errors = Arg::new("ignore-errors")
+            .short('e')
+            .long("ignore-errors")
+            .about("ignore all io errors");
+
         let file = Arg::new("file").multiple(true);
 
         let follow_links = Arg::new("follow-links")
@@ -36,7 +42,8 @@ impl Cmd {
             .long("follow-links")
             .about("follow links");
 
-        app.arg(follow_links)
+        app.arg(ignore_errors)
+            .arg(follow_links)
             .arg(bytes)
             .arg(ignore_hidden)
             .arg(file)
@@ -45,6 +52,7 @@ impl Cmd {
     pub fn from_args() -> Self {
         let matches = Self::app().get_matches();
 
+        let ignore_errors = matches.is_present("ignore-errors");
         let follow_links = matches.is_present("follow-links");
         let bytes = matches.is_present("bytes");
         let ignore_hidden = matches.is_present("ignore-hidden");
@@ -55,6 +63,7 @@ impl Cmd {
         };
         Self {
             ignore_hidden,
+            ignore_errors,
             follow_links,
             bytes,
             files,
@@ -111,18 +120,18 @@ impl Cmd {
             .filter_entry(|e| !self.ignore_hidden || !is_hidden(&e.file_name()))
             .filter_map(|r| {
                 r.map_err(|e| {
-                    eprintln!(
-                        "error accessing {}: {}",
-                        e.path().unwrap_or_else(|| Path::new("")).display(),
-                        &e
-                    );
+                    if !self.ignore_errors {
+                        eprintln!("error: {}", &e);
+                    }
                 })
                 .ok()
             })
             .filter_map(|x| {
                 x.metadata()
                     .map_err(|e| {
-                        eprintln!("error reading metadata of {}: {}", x.path().display(), &e);
+                        if !self.ignore_errors {
+                            eprintln!("error reading metadata of {}: {}", x.path().display(), &e);
+                        }
                     })
                     .map(|md| md.len())
                     .ok()
@@ -144,8 +153,12 @@ impl Cmd {
             }
         })
         .unwrap_or_else(|e| {
-            eprintln!("error accessing {}: {}", name.as_ref().display(), &e);
-            process::exit(2);
+            if !self.ignore_errors {
+                eprintln!("error accessing {}: {}", name.as_ref().display(), &e);
+                process::exit(2);
+            } else {
+                0
+            }
         })
     }
 }
