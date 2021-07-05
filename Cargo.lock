@@ -58,12 +58,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "either"
-version = "1.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
-
-[[package]]
 name = "getopts"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -110,15 +104,6 @@ checksum = "824845a0bf897a9042383849b02c1bc219c2383772efcd5c6f9766fa4b81aef3"
 dependencies = [
  "autocfg",
  "hashbrown",
-]
-
-[[package]]
-name = "itertools"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37d572918e350e82412fe766d24b15e6682fb2ed2bbe018280caa810397cb319"
-dependencies = [
- "either",
 ]
 
 [[package]]
@@ -219,11 +204,10 @@ dependencies = [
 
 [[package]]
 name = "sz"
-version = "0.3.2"
+version = "0.4.0"
 dependencies = [
  "clap",
  "glob",
- "itertools",
  "pretty-bytes",
  "walkdir",
 ]
