@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 mod cmd;
 
 use cmd::Cmd;
@@ -8,7 +10,7 @@ fn main() {
     let total = opt.calculate();
     if opt.bytes {
         println!("{}", total);
-        return;
+    } else {
+        println!("{}", convert(total as f64));
     }
-    println!("{}", convert(total as f64));
 }
