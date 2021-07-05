@@ -19,23 +19,25 @@ fn calc_dir(dir: &str, ignore_hidden: bool) -> u64 {
             })
             .filter_map(|e| e.ok())
             .filter(|x| !x.file_type().is_dir())
-            .fold(0u64, |sum, x| {
-                sum + match x.metadata() {
-                    Err(_) => 0,
-                    Ok(m) => m.len(),
-                }
+            .map(|x| {
+                x.path()
+                    .symlink_metadata()
+                    .map(|md| md.len())
+                    .unwrap_or(0_u64)
             })
+            .sum()
     } else {
         WalkDir::new(dir)
             .into_iter()
             .filter_map(|e| e.ok())
             .filter(|x| !x.file_type().is_dir())
-            .fold(0u64, |sum, x| {
-                sum + match x.metadata() {
-                    Err(_) => 0,
-                    Ok(m) => m.len(),
-                }
+            .map(|x| {
+                x.path()
+                    .symlink_metadata()
+                    .map(|md| md.len())
+                    .unwrap_or(0_u64)
             })
+            .sum()
     }
 }
 
@@ -43,7 +45,7 @@ fn calc_size(name: &str, ignore_hidden: bool) -> u64 {
     if ignore_hidden && is_hidden(name) {
         return 0;
     }
-    match fs::metadata(name) {
+    match fs::symlink_metadata(name) {
         Ok(m) => {
             if m.is_dir() {
                 calc_dir(name, ignore_hidden)
