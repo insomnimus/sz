@@ -1,16 +1,17 @@
-#![warn(clippy::all)]
+mod app;
+mod bytes;
+#[cfg(windows)]
+mod job;
 
-mod cmd;
-
-use cmd::Cmd;
-use pretty_bytes::converter::convert;
+use app::Cmd;
+use bytes::Bytes;
 
 fn main() {
-    let opt = Cmd::from_args();
-    let total = opt.calculate();
-    if opt.bytes {
-        println!("{}", total);
-    } else {
-        println!("{}", convert(total as f64));
-    }
+	let opt = Cmd::from_args();
+	let total = opt.calculate();
+	if opt.bytes {
+		println!("{}", total);
+	} else {
+		println!("{:.2}", Bytes(total));
+	}
 }
