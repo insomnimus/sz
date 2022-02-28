@@ -27,6 +27,9 @@ pub struct Cmd {
 	/// Do not traverse hidden directories, do not count hidden files.
 	#[clap(short = 'd', long)]
 	ignore_hidden: bool,
+	/// Read .ignore files and apply them.
+	#[clap(short = 'i', long)]
+	ignore: bool,
 	/// Follow symbolic links.
 	#[clap(short, long)]
 	follow_links: bool,
@@ -78,6 +81,7 @@ impl Cmd {
 		}
 		.standard_filters(false)
 		.follow_links(self.follow_links)
+		.ignore(self.ignore)
 		.hidden(self.ignore_hidden)
 		.build_parallel();
 

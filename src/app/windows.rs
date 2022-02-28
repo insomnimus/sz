@@ -5,10 +5,11 @@ use globset::GlobMatcher;
 use super::*;
 use crate::job::Job;
 
-fn new_walker(p: &Path, follow_links: bool, hidden: bool) -> WalkParallel {
+fn new_walker(p: &Path, follow_links: bool, hidden: bool, ignore: bool) -> WalkParallel {
 	WalkBuilder::new(p)
 		.standard_filters(false)
 		.follow_links(follow_links)
+		.ignore(ignore)
 		.hidden(hidden)
 		.build_parallel()
 }
@@ -20,6 +21,7 @@ fn spawn_job_glob(
 	hidden: bool,
 	follow_links: bool,
 	quiet: bool,
+	ignore: bool,
 ) {
 	thread::spawn(move || {
 		walker.run(move || {
@@ -38,7 +40,7 @@ fn spawn_job_glob(
 
 				let tx = tx.clone();
 				// Inner
-				new_walker(p.path(), follow_links, hidden).run(move || {
+				new_walker(p.path(), follow_links, hidden, ignore).run(move || {
 					let tx = tx.clone();
 					Box::new(move |entry| {
 						match entry {
@@ -60,7 +62,12 @@ impl Cmd {
 		let (tx, rx) = mpsc::channel();
 
 		if self.files.is_empty() {
-			let walker = new_walker(".".as_ref(), self.follow_links, self.ignore_hidden);
+			let walker = new_walker(
+				".".as_ref(),
+				self.follow_links,
+				self.ignore_hidden,
+				self.ignore,
+			);
 			spawn_job(walker, tx.clone(), self.quiet)
 		} else {
 			let mut pwd_files = Vec::new();
@@ -75,6 +82,7 @@ impl Cmd {
 							.standard_filters(false)
 							.follow_links(self.follow_links)
 							.hidden(self.ignore_hidden)
+							.ignore(self.ignore)
 							.build_parallel();
 						spawn_job_glob(
 							walker,
@@ -83,6 +91,7 @@ impl Cmd {
 							self.follow_links,
 							self.ignore_hidden,
 							self.quiet,
+							self.ignore,
 						);
 					}
 				};
@@ -96,6 +105,7 @@ impl Cmd {
 				let walker = walker
 					.standard_filters(false)
 					.follow_links(self.follow_links)
+					.ignore(self.ignore)
 					.hidden(self.ignore_hidden)
 					.build_parallel();
 
